@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Part Label</title>
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Times New Roman", serif;
+    }
+    .label {
+      padding: 20px;
+      box-sizing: border-box;
+      display: none;
+      border: 1px dashed #000;
+      background: #fff;
+      margin-bottom: 40px;
+    }
+    .vertical {
+      width: 4in;
+      height: 6in;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+    }
+    
+    .horizontal {
+  width: 6in;
+  height: 4in;
+  flex-direction: column; /* logo on top */
+  align-items: stretch;
+  justify-content: flex-start;
+}
+
+.horizontal .horizontal-body {
+  display: flex;
+  flex-direction: row; /* text on left, QR on right */
+  justify-content: space-between;
+  align-items: center;
+  flex: 1;
+}
+
+    .logo {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 10px;
+    }
+    .logo img {
+      max-height: 70px;
+    }
+    .text-content {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .part-name {
+      font-size: 32px;
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 15px;
+      word-wrap: break-word;
+    }
+    .part-program {
+      font-size: 26px;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    .part-number {
+      font-size: 22px;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    .attn {
+      font-size: 22px;
+      text-align: center;
+      margin-bottom: 12px;
+    }
+    .storage {
+      font-size: 18px;
+      text-align: center;
+      margin-bottom: 6px;
+    }
+    .label-date {
+      font-size: 16px;
+      text-align: center;
+      margin-top: auto;
+    }
+    .qr-code {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 15px;
+    }
+    .buttons {
+      margin: 20px;
+      text-align: left;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin: 10px;
+      cursor: pointer;
+    }
+    @media print {
+      .buttons {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Vertical Label -->
+  <div class="label vertical" id="labelContentVertical">
+    <div class="logo">
+      <img src="/assets/multimatic_label/Logo.png" alt="Company Logo">
+    </div>
+    <div class="part-name" id="itemName">Loading...</div>
+    <div class="part-program" id="program">Loading...</div>
+    <div class="part-number" id="partNumber">Loading...</div>
+    <div class="attn" id="attn">Attn: Loading...</div>
+    <div class="storage" id="storage">APQP Storage: ...</div>
+    <div class="qr-code"><div id="qrCodeContainer"></div></div>
+    <div class="label-date" id="date">Label Created On: ...</div>
+  </div>
+
+  <!-- Horizontal Label -->
+<div class="label horizontal" id="labelContentHorizontal">
+  <div class="logo">
+    <img src="/assets/multimatic_label/Logo.png" alt="Company Logo">
+  </div>
+  <div class="horizontal-body">
+    <div class="text-content">
+      <div class="part-name" id="itemNameH">Loading...</div>
+      <div class="part-program" id="programH">Loading...</div>
+      <div class="part-number" id="partNumberH">Loading...</div>
+      <div class="attn" id="attnH">Attn: Loading...</div>
+      <div class="storage" id="storageH">APQP Storage: ...</div>
+      <div class="label-date" id="dateH">Label Created On: ...</div>
+    </div>
+    <div class="qr-code"><div id="qrCodeContainerH"></div></div>
+  </div>
+</div>
+
+
+  <!-- Buttons -->
+  <div class="buttons">
+    <button onclick="toggleView()">Toggle Label Orientation</button>
+    <button onclick="exportPNG()">Download Label</button>
+  </div>
+
+  <script>
+    const verticalLabel = document.getElementById('labelContentVertical');
+    const horizontalLabel = document.getElementById('labelContentHorizontal');
+    let isVertical = false; // Start with horizontal view
+
+    function getParam(key) {
+      return new URLSearchParams(window.location.search).get(key) || '';
+    }
+
+    const item = decodeURIComponent(getParam('item'));
+    const program = decodeURIComponent(getParam('program'));
+    const part = decodeURIComponent(getParam('part'));
+    const attn = decodeURIComponent(getParam('manager'));
+    const storage = decodeURIComponent(getParam('storage'));
+    const qr = getParam('qr');
+    const today = new Date().toLocaleDateString('en-CA', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+
+    function populateLabels() {
+      // Vertical
+      document.getElementById('itemName').innerText = item;
+      document.getElementById('program').innerText = program;
+      document.getElementById('partNumber').innerText = part;
+      document.getElementById('attn').innerText = 'Attn: ' + attn;
+      document.getElementById('storage').innerText = 'APQP Storage: ' + storage;
+      document.getElementById('date').innerText = 'Label Created On: ' + today;
+      new QRCode(document.getElementById("qrCodeContainer"), { text: qr, width: 190, height: 190 });
+
+      // Horizontal
+      document.getElementById('itemNameH').innerText = item;
+      document.getElementById('programH').innerText = program;
+      document.getElementById('partNumberH').innerText = part;
+      document.getElementById('attnH').innerText = 'Attn: ' + attn;
+      document.getElementById('storageH').innerText = 'APQP Storage: ' + storage;
+      document.getElementById('dateH').innerText = 'Label Created On: ' + today;
+      new QRCode(document.getElementById("qrCodeContainerH"), { text: qr, width: 200, height: 200 });
+    }
+
+    function toggleView() {
+      isVertical = !isVertical;
+      verticalLabel.style.display = isVertical ? 'flex' : 'none';
+      horizontalLabel.style.display = isVertical ? 'none' : 'flex';
+    }
+
+    function exportPNG() {
+      const label = isVertical ? verticalLabel : horizontalLabel;
+      html2canvas(label, { scale: 2 }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = isVertical ? 'label-vertical.png' : 'label-horizontal.png';
+        link.href = canvas.toDataURL();
+        link.click();
+      });
+    }
+
+    window.onload = () => {
+      populateLabels();
+      toggleView(); // Show horizontal by default
+    };
+  </script>
+
+</body>
+</html>
