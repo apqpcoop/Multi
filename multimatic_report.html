@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Scrap Report</title>
+  <meta charset="UTF-8">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      max-width: 900px;
+      margin: auto;
+      background-color: #f9f9f9;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .header img {
+      height: 80px;
+    }
+    h2 {
+      margin: 10px 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background-color: white;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: left;
+      word-break: keep-all;
+    }
+    th {
+      background-color: #eee;
+    }
+    .section-title {
+      margin-top: 40px;
+      font-size: 20px;
+      color: #333;
+    }
+    #downloadContainer {
+      text-align: center;
+    }
+    .btn {
+      padding: 12px 25px;
+      font-size: 16px;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 15px;
+      margin-right: 10px;
+    }
+    .btn:hover {
+      background-color: #0056b3;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 60px;
+      font-size: 12px;
+      color: #888;
+    }
+    #report {
+      background-color: white;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    @media print {
+      .btn, #downloadContainer {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+<div id="report">
+  <div class="header">
+    <img src="/assets/multimatic_label/Logo.png" alt="Company Logo">
+    <h2>Scrap Report</h2>
+    <p id="filters"></p>
+  </div>
+
+  <div class="section-title">Parts with Scrap Date</div>
+  <table id="knownTable">
+    <thead>
+    <tr>
+      <th>Part Name</th>
+      <th>Part Number</th>
+      <th>Quantity</th>
+      <th>Location</th>
+      <th>Scrap By Date</th>
+      <th>Update Scrap Date</th>
+    </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <div class="section-title">Parts with Unknown Scrap Date</div>
+  <table id="unknownTable">
+    <thead>
+    <tr>
+      <th>Part Name</th>
+      <th>Part Number</th>
+      <th>Quantity</th>
+      <th>Location</th>
+      <th>Update Scrap Date</th>
+    </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <div id="downloadContainer">
+    <button class="btn" onclick="window.print()">Download PDF</button>
+    <button class="btn" onclick="sendToOutlook()">Send to Email</button>
+  </div>
+</div>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const rawData = decodeURIComponent(params.get('data') || '[]');
+  const manager = params.get('manager') || 'UnknownManager';
+  const date = params.get('date') || 'UnknownDate';
+
+  document.getElementById('filters').textContent = `Filtered by Manager: ${manager}, Date: ${date}`;
+
+  let data = [];
+  try {
+    data = JSON.parse(rawData);
+  } catch (e) {
+    alert("Failed to parse part data.");
+  }
+
+  const knownBody = document.querySelector('#knownTable tbody');
+  const unknownBody = document.querySelector('#unknownTable tbody');
+
+  data.forEach(item => {
+    const hasDate = item.date && item.date.trim() !== '';
+
+    if (hasDate) {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${item.name}</td>
+        <td>${item.number}</td>
+        <td>${item.qty}</td>
+        <td>${item.location}</td>
+        <td>${item.date}</td>
+        <td><a href="${item.link}" target="_blank">Update Date</a></td>
+      `;
+      knownBody.appendChild(row);
+    } else {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${item.name}</td>
+        <td>${item.number}</td>
+        <td>${item.qty}</td>
+        <td>${item.location}</td>
+        <td><a href="${item.link}" target="_blank">Update Date</a></td>
+      `;
+      unknownBody.appendChild(row);
+    }
+  });
+
+  async function sendToOutlook() {
+    try {
+      const reportHtml = document.getElementById('report').outerHTML;
+
+      // Copy HTML to clipboard
+      await navigator.clipboard.write([
+        new ClipboardItem({
+          "text/html": new Blob([reportHtml], { type: "text/html" }),
+          "text/plain": new Blob([document.getElementById('report').innerText], { type: "text/plain" })
+        })
+      ]);
+
+      // Open new email in Outlook (mailto)
+      const subject = encodeURIComponent('Scrap Report');
+      const body = encodeURIComponent('Report copied! Please press Ctrl+V to paste it here.');
+      window.location.href = `mailto:?subject=${subject}&body=${body}`;
+
+      alert("Report copied to clipboard! When Outlook opens, press Ctrl+V to paste the report.");
+    } catch (err) {
+      alert("Failed to copy report. Please allow clipboard permissions.");
+    }
+  }
+</script>
+</body>
+</html>
+
