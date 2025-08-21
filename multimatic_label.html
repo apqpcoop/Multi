@@ -25,30 +25,32 @@
       align-items: center;
       justify-content: flex-start;
     }
-    
     .horizontal {
-  width: 6in;
-  height: 4in;
-  flex-direction: column; /* logo on top */
-  align-items: stretch;
-  justify-content: flex-start;
-}
-
-.horizontal .horizontal-body {
-  display: flex;
-  flex-direction: row; /* text on left, QR on right */
-  justify-content: space-between;
-  align-items: center;
-  flex: 1;
-}
-
+      width: 6in;
+      height: 4in;
+      flex-direction: column; /* logo on top */
+      align-items: stretch;
+      justify-content: flex-start;
+    }
+    .horizontal .horizontal-body {
+      display: flex;
+      flex-direction: row; /* text on left, QR on right */
+      justify-content: space-between;
+      align-items: center;
+      flex: 1;
+    }
     .logo {
       display: flex;
       justify-content: center;
       margin-bottom: 10px;
     }
-    .logo img {
-      max-height: 70px;
+    .logo-text {
+      font-size: 40px;
+      font-weight: bold;
+      text-transform: uppercase;
+      text-align: center;
+      letter-spacing: 4px; /* spacing between letters */
+      font-family: Arial Black, sans-serif;
     }
     .text-content {
       display: flex;
@@ -115,7 +117,7 @@
   <!-- Vertical Label -->
   <div class="label vertical" id="labelContentVertical">
     <div class="logo">
-      <img src="/assets/multimatic_label/Logo.png" alt="Company Logo">
+      <div class="logo-text">apqp</div>
     </div>
     <div class="part-name" id="itemName">Loading...</div>
     <div class="part-program" id="program">Loading...</div>
@@ -127,23 +129,22 @@
   </div>
 
   <!-- Horizontal Label -->
-<div class="label horizontal" id="labelContentHorizontal">
-  <div class="logo">
-    <img src="/assets/multimatic_label/Logo.png" alt="Company Logo">
-  </div>
-  <div class="horizontal-body">
-    <div class="text-content">
-      <div class="part-name" id="itemNameH">Loading...</div>
-      <div class="part-program" id="programH">Loading...</div>
-      <div class="part-number" id="partNumberH">Loading...</div>
-      <div class="attn" id="attnH">Attn: Loading...</div>
-      <div class="storage" id="storageH">APQP Storage: ...</div>
-      <div class="label-date" id="dateH">Label Created On: ...</div>
+  <div class="label horizontal" id="labelContentHorizontal">
+    <div class="logo">
+      <div class="logo-text">apqp</div>
     </div>
-    <div class="qr-code"><div id="qrCodeContainerH"></div></div>
+    <div class="horizontal-body">
+      <div class="text-content">
+        <div class="part-name" id="itemNameH">Loading...</div>
+        <div class="part-program" id="programH">Loading...</div>
+        <div class="part-number" id="partNumberH">Loading...</div>
+        <div class="attn" id="attnH">Attn: Loading...</div>
+        <div class="storage" id="storageH">APQP Storage: ...</div>
+        <div class="label-date" id="dateH">Label Created On: ...</div>
+      </div>
+      <div class="qr-code"><div id="qrCodeContainerH"></div></div>
+    </div>
   </div>
-</div>
-
 
   <!-- Buttons -->
   <div class="buttons">
@@ -216,3 +217,4 @@
 
 </body>
 </html>
+
